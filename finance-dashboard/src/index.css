@@ -1,1 +1,75 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap");
+
+/* ── LIGHT MODE (default) ─────────────────────────── */
+:root {
+  --orange:     #f97316;
+  --orange2:    #fb923c;
+  --orange3:    #ea6c05;
+  --orange-dim: rgba(249,115,22,0.12);
+
+  --bg:         #fafaf9;
+  --bg2:        #ffffff;
+  --bg3:        #f4f4f3;
+  --bg4:        #e8e8e6;
+
+  --border:     rgba(0,0,0,0.08);
+  --border2:    rgba(0,0,0,0.14);
+
+  --text:       #1a1a1a;
+  --text2:      #4a4a4a;
+  --text3:      #9a9a9a;
+
+  --green:      #16a34a;
+  --green-bg:   rgba(22,163,74,0.1);
+  --red:        #dc2626;
+  --red-bg:     rgba(220,38,38,0.1);
+  --blue:       #2563eb;
+
+  --shadow:     0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  --shadow-lg:  0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+
+  --font:  "Space Grotesk", sans-serif;
+  --mono:  "JetBrains Mono", monospace;
+}
+
+/* ── DARK MODE ────────────────────────────────────── */
+.dark {
+  --bg:         #0a0a0a;
+  --bg2:        #111111;
+  --bg3:        #1a1a1a;
+  --bg4:        #232323;
+
+  --border:     rgba(255,255,255,0.07);
+  --border2:    rgba(255,255,255,0.12);
+
+  --text:       #f0f0f0;
+  --text2:      #a3a3a3;
+  --text3:      #525252;
+
+  --green:      #22c55e;
+  --green-bg:   rgba(34,197,94,0.12);
+  --red:        #ef4444;
+  --red-bg:     rgba(239,68,68,0.12);
+
+  --shadow:     0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.3);
+  --shadow-lg:  0 4px 24px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.3s, color 0.3s;
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--orange); }
+
+#root { position: relative; z-index: 1; }
