@@ -1,46 +1,32 @@
 import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
 import { Chart, registerables } from "chart.js";
 import { getCategoryColor } from "../data/mockData";
 
 Chart.register(...registerables);
 
-function Card({ children, delay = 0, title, badge }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.45, ease: [0.23, 1, 0.32, 1] }}
-      style={{
-        background: "var(--bg2)", border: "1px solid var(--border)",
-        borderRadius: 16, padding: "22px 24px",
-        boxShadow: "var(--shadow)",
-      }}
-    >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-        <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{title}</span>
-        {badge && (
-          <span style={{ fontFamily: "var(--mono)", fontSize: 10, background: "var(--bg3)", color: "var(--text3)", borderRadius: 99, padding: "4px 12px" }}>
-            {badge}
-          </span>
-        )}
-      </div>
-      {children}
-    </motion.div>
-  );
-}
-
-const tooltip = { backgroundColor: "var(--bg3)", borderColor: "var(--border2)", borderWidth: 1, titleColor: "var(--text)", bodyColor: "var(--text2)", cornerRadius: 8, padding: 10 };
+const tooltip = {
+  backgroundColor: "var(--bg3)",
+  borderColor: "var(--border2)",
+  borderWidth: 1,
+  titleColor: "var(--text)",
+  bodyColor: "var(--text2)",
+  cornerRadius: 10,
+  padding: 10,
+};
 
 function scale(axis) {
   return {
-    ticks: { color: "#9a9a9a", font: { size: 11, family: "JetBrains Mono" }, ...(axis === "y" ? { callback: (v) => "₹" + v } : {}) },
-    grid:  { color: "rgba(128,128,128,0.08)" },
+    ticks: {
+      color: "var(--text3)",
+      font: { size: 11, family: "DM Mono" },
+      ...(axis === "y" ? { callback: (v) => "₹" + v } : {}),
+    },
+    grid: { color: "rgba(128,128,128,0.06)" },
     border: { display: false },
   };
 }
 
-/* ── Balance Trend ─────────────────────────────── */
+/* ── Balance Trend ─── */
 export function BalanceTrendChart({ transactions }) {
   const ref   = useRef(null);
   const chart = useRef(null);
@@ -62,10 +48,12 @@ export function BalanceTrendChart({ transactions }) {
         labels: days.map((d) => d.slice(8) + " Apr"),
         datasets: [{
           label: "Balance", data,
-          borderColor: "#f97316", backgroundColor: "rgba(249,115,22,0.07)",
-          tension: 0.4, fill: true,
-          pointBackgroundColor: "#f97316", pointRadius: 4, pointHoverRadius: 6,
-          borderWidth: 2,
+          borderColor: "#f97316",
+          backgroundColor: "rgba(249,115,22,0.06)",
+          tension: 0.45, fill: true,
+          pointBackgroundColor: "#f97316",
+          pointRadius: 5, pointHoverRadius: 7,
+          borderWidth: 2.5,
         }],
       },
       options: {
@@ -78,13 +66,17 @@ export function BalanceTrendChart({ transactions }) {
   }, [transactions]);
 
   return (
-    <Card title="Balance Trend" badge="Apr 2026" delay={0.1}>
-      <div style={{ position: "relative", height: 200 }}><canvas ref={ref} /></div>
-    </Card>
+    <div className="chart-card" id="section-analytics">
+      <div className="chart-title-row">
+        <span className="chart-title">Balance Trend</span>
+        <span className="section-badge">Apr 2026</span>
+      </div>
+      <div style={{ position: "relative", height: 210 }}><canvas ref={ref} /></div>
+    </div>
   );
 }
 
-/* ── Spending Donut ────────────────────────────── */
+/* ── Spending Donut ─── */
 export function SpendingDonutChart({ transactions }) {
   const ref   = useRef(null);
   const chart = useRef(null);
@@ -102,10 +94,10 @@ export function SpendingDonutChart({ transactions }) {
       type: "doughnut",
       data: {
         labels: entries.map(([k]) => k),
-        datasets: [{ data: entries.map(([, v]) => v), backgroundColor: entries.map(([k]) => getCategoryColor(k)), borderWidth: 0, hoverOffset: 4 }],
+        datasets: [{ data: entries.map(([, v]) => v), backgroundColor: entries.map(([k]) => getCategoryColor(k)), borderWidth: 0, hoverOffset: 6 }],
       },
       options: {
-        responsive: false, cutout: "70%",
+        responsive: false, cutout: "72%",
         plugins: { legend: { display: false }, tooltip: { ...tooltip, callbacks: { label: (c) => " ₹" + c.parsed.toLocaleString("en-IN") } } },
       },
     });
@@ -113,21 +105,32 @@ export function SpendingDonutChart({ transactions }) {
   }, [transactions]);
 
   return (
-    <Card title="Spending Breakdown" badge="by category" delay={0.15}>
-      <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-        <div style={{ flexShrink: 0, width: 160, height: 160, position: "relative" }}>
-          <canvas ref={ref} width={160} height={160} />
+    <div className="chart-card">
+      <div className="chart-title-row">
+        <span className="chart-title">Spending Breakdown</span>
+        <span className="section-badge">by category</span>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+        <div style={{ flexShrink: 0, width: 140, height: 140, position: "relative" }}>
+          <canvas ref={ref} width={140} height={140} />
           {total > 0 && (
-            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
-              <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--text3)" }}>total</div>
-              <div style={{ fontFamily: "var(--mono)", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>₹{total.toLocaleString("en-IN")}</div>
+            <div style={{
+              position: "absolute", inset: 0,
+              display: "flex", flexDirection: "column",
+              alignItems: "center", justifyContent: "center",
+              pointerEvents: "none",
+            }}>
+              <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)" }}>total</div>
+              <div style={{ fontFamily: "var(--head)", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
+                ₹{total.toLocaleString("en-IN")}
+              </div>
             </div>
           )}
         </div>
         <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
           {entries.map(([k, v]) => (
             <div key={k} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ width: 8, height: 8, borderRadius: 2, background: getCategoryColor(k), flexShrink: 0 }} />
+              <span style={{ width: 7, height: 7, borderRadius: 2, background: getCategoryColor(k), flexShrink: 0, display: "inline-block" }} />
               <span style={{ fontSize: 12, color: "var(--text2)", flex: 1, fontWeight: 500 }}>{k}</span>
               <span style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--text3)" }}>
                 {total ? Math.round((v / total) * 100) : 0}%
@@ -136,11 +139,11 @@ export function SpendingDonutChart({ transactions }) {
           ))}
         </div>
       </div>
-    </Card>
+    </div>
   );
 }
 
-/* ── Monthly Bar ───────────────────────────────── */
+/* ── Monthly Bar ─── */
 export function MonthlyBarChart({ transactions }) {
   const ref   = useRef(null);
   const chart = useRef(null);
@@ -157,8 +160,8 @@ export function MonthlyBarChart({ transactions }) {
       data: {
         labels,
         datasets: [
-          { label: "Income",  data: income,  backgroundColor: "rgba(22,163,74,0.75)",  borderRadius: 6, borderSkipped: false },
-          { label: "Expense", data: expense, backgroundColor: "rgba(220,38,38,0.65)", borderRadius: 6, borderSkipped: false },
+          { label: "Income",  data: income,  backgroundColor: "rgba(34,197,94,0.7)",  borderRadius: 8, borderSkipped: false },
+          { label: "Expense", data: expense, backgroundColor: "rgba(239,68,68,0.6)", borderRadius: 8, borderSkipped: false },
         ],
       },
       options: {
@@ -174,15 +177,18 @@ export function MonthlyBarChart({ transactions }) {
   }, [transactions]);
 
   return (
-    <Card title="Income vs Expense" badge="monthly" delay={0.2}>
-      <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
-        {[["Income", "var(--green)"], ["Expense", "var(--red)"]].map(([l, c]) => (
-          <span key={l} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text3)" }}>
-            <span style={{ width: 10, height: 10, borderRadius: 3, background: c, display: "inline-block" }} /> {l}
-          </span>
-        ))}
+    <div className="chart-card" style={{ marginBottom: 14 }}>
+      <div className="chart-title-row">
+        <span className="chart-title">Income vs Expense</span>
+        <div style={{ display: "flex", gap: 14 }}>
+          {[["Income", "var(--green)"], ["Expense", "var(--red)"]].map(([l, c]) => (
+            <span key={l} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "var(--text3)" }}>
+              <span style={{ width: 9, height: 9, borderRadius: 3, background: c, display: "inline-block" }} /> {l}
+            </span>
+          ))}
+        </div>
       </div>
       <div style={{ position: "relative", height: 160 }}><canvas ref={ref} /></div>
-    </Card>
+    </div>
   );
 }
