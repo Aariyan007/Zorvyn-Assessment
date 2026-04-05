@@ -1,53 +1,94 @@
 import { motion } from "framer-motion";
 
-function fmt(n) { return "₹" + n.toLocaleString("en-IN"); }
+function fmt(n) { return "₹" + Math.abs(n).toLocaleString("en-IN"); }
 
 export default function Insights({ transactions }) {
-  const expenses = transactions.filter((t) => t.type === "expense");
-  const income   = transactions.filter((t) => t.type === "income").reduce((a, t) => a + t.amount, 0);
-  const expense  = expenses.reduce((a, t) => a + t.amount, 0);
-  const balance  = income - expense;
+  // Calculate insights
+  const categories = {};
+  const recurring = {};
+  
+  transactions.forEach(t => {
+    // Group by category
+    if (!categories[t.category]) {
+      categories[t.category] = { count: 0, total: 0 };
+    }
+    categories[t.category].count += 1;
+    categories[t.category].total += Number(t.amount) || 0;
+    
+    // Track recurring (simplified - same category multiple times)
+    if (!recurring[t.category]) recurring[t.category] = 0;
+    recurring[t.category] += 1;
+  });
 
-  const catMap = {};
-  expenses.forEach((t) => { catMap[t.category] = (catMap[t.category] || 0) + t.amount; });
-  const sorted = Object.entries(catMap).sort((a, b) => b[1] - a[1]);
-  const top    = sorted[0] ?? ["N/A", 0];
+  const topCategory = Object.entries(categories).sort((a, b) => b[1].total - a[1].total)[0];
+  const avgTransaction = transactions.length > 0 
+    ? transactions.reduce((sum, t) => sum + (Number(t.amount) || 0), 0) / transactions.length 
+    : 0;
 
-  const savingsRate = income > 0 ? Math.round((balance / income) * 100) : 0;
-  const avgExpense  = expenses.length ? Math.round(expense / expenses.length) : 0;
-
-  const aprInc = transactions.filter((t) => t.type === "income" && t.date.startsWith("2026-04")).reduce((a, t) => a + t.amount, 0);
-  const marInc = transactions.filter((t) => t.type === "income" && t.date.startsWith("2026-03")).reduce((a, t) => a + t.amount, 0);
-  const growth = marInc > 0 ? Math.round(((aprInc - marInc) / marInc) * 100) : 0;
-
-  const cards = [
-    { icon: "🔥", label: "Top Category",  value: top[0],   sub: fmt(top[1]) + " total" },
-    { icon: "🎯", label: "Savings Rate",  value: savingsRate + "%", sub: "of income saved" },
-    { icon: "📊", label: "Avg Expense",   value: fmt(avgExpense), sub: "per transaction" },
-    { icon: "📈", label: "Income Growth", value: (growth >= 0 ? "+" : "") + growth + "%", sub: "vs last month" },
-  ];
+  const recurringTxs = Object.entries(recurring).filter(([_, count]) => count > 2).length;
 
   return (
-    <div style={{ marginBottom: 24 }} id="section-insights">
+    <div id="section-insights" style={{ scrollMarginTop: 80 }}>
       <div className="section-header">
-        <span className="section-title">Insights</span>
-        <span className="section-badge">Live</span>
+        <span className="section-title">Key Insights</span>
       </div>
-      <div className="insights-grid">
-        {cards.map((c, i) => (
-          <motion.div
-            key={c.label}
-            className="insight-card"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.07, duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-          >
-            <span className="insight-icon">{c.icon}</span>
-            <div className="insight-label">{c.label}</div>
-            <div className="insight-value">{c.value}</div>
-            <div className="insight-sub">{c.sub}</div>
-          </motion.div>
-        ))}
+      <div className="insights-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
+        
+        {/* Top Spending Category */}
+        <motion.div
+          className="insight-card"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          style={{
+            background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: "var(--radius)",
+            padding: 16,
+          }}
+        >
+          <div style={{ fontSize: 12, color: "var(--text3)", marginBottom: 8 }}>Top Spending</div>
+          <div style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>
+            {topCategory ? topCategory[0] : "N/A"}
+          </div>
+          <div style={{ fontSize: 14, color: "var(--orange)" }}>
+            {topCategory ? fmt(topCategory[1].total) : "₹0"}
+          </div>
+        </motion.div>
+
+        {/* Average Transaction */}
+        <motion.div
+          className="insight-card"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05, duration: 0.4 }}
+          style={{
+            background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: "var(--radius)",
+            padding: 16,
+          }}
+        >
+          <div style={{ fontSize: 12, color: "var(--text3)", marginBottom: 8 }}>Avg Transaction</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: "var(--text)" }}>
+            {fmt(avgTransaction)}
+          </div>
+        </motion.div>
+
+        {/* Recurring Categories */}
+        <motion.div
+          className="insight-card"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.4 }}
+          style={{
+            background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: "var(--radius)",
+            padding: 16,
+          }}
+        >
+          <div style={{ fontSize: 12, color: "var(--text3)", marginBottom: 8 }}>Recurring Patterns</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: "var(--green)" }}>
+            {recurringTxs}
+          </div>
+          <div style={{ fontSize: 12, color: "var(--text3)" }}>categories</div>
+        </motion.div>
+
       </div>
     </div>
   );

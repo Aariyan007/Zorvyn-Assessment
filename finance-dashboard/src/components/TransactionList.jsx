@@ -1,18 +1,16 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { getCategoryColor } from "../data/mockData";
+import { CategoryIcon, IconArrowUp, IconArrowDown, IconEmpty } from "./Icons";
 
 function fmt(n) { return "₹" + Math.abs(n).toLocaleString("en-IN"); }
-
-function catEmoji(cat) {
-  const map = { Food: "🍔", Salary: "💼", Shopping: "🛍", Freelance: "💻", Travel: "✈️", Rent: "🏠", Utilities: "⚡" };
-  return map[cat] || "📁";
-}
 
 export default function TransactionList({ transactions, role, deleteTx }) {
   if (!transactions.length) {
     return (
       <div className="empty-state">
-        <span className="empty-icon">📭</span>
+        <span style={{ display: "flex", justifyContent: "center", marginBottom: 12, color: "var(--text3)" }}>
+          <IconEmpty size={40} color="currentColor" />
+        </span>
         <div className="empty-title">No transactions found</div>
         <div className="empty-sub">Try adjusting your filters</div>
       </div>
@@ -44,29 +42,40 @@ export default function TransactionList({ transactions, role, deleteTx }) {
 
               <td>
                 <div className="tx-cat-wrap">
-                  <div
-                    className="tx-cat-icon"
-                    style={{ background: getCategoryColor(t.category) + "18" }}
-                  >
-                    {catEmoji(t.category)}
-                  </div>
+                  <CategoryIcon
+                    category={t.category}
+                    size={14}
+                    bgColor={getCategoryColor(t.category) + "18"}
+                  />
                   <span className="tx-cat-name">{t.category}</span>
                 </div>
               </td>
 
               <td>
-                <span className={`type-badge ${t.type === "income" ? "type-income" : "type-expense"}`}>
-                  {t.type === "income" ? "↑ income" : "↓ expense"}
+                <span className={`type-badge ${t.type === "income" ? "type-income" : "type-expense"}`}
+                  style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                  {t.type === "income"
+                    ? <><IconArrowUp size={10} color="var(--green)" /> income</>
+                    : <><IconArrowDown size={10} color="var(--red)" /> expense</>}
                 </span>
               </td>
 
               <td>
-                <span
-                  className="tx-amount"
-                  style={{ color: t.type === "income" ? "var(--green)" : "var(--red)" }}
-                >
-                  {t.type === "income" ? "+" : "−"}{fmt(t.amount)}
-                </span>
+                {/* gradient text for income, plain red for expense */}
+                {t.type === "income" ? (
+                  <span className="tx-amount" style={{
+                    background: "var(--grad-text)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}>
+                    +{fmt(t.amount)}
+                  </span>
+                ) : (
+                  <span className="tx-amount" style={{ color: "var(--red)" }}>
+                    −{fmt(t.amount)}
+                  </span>
+                )}
               </td>
 
               {role === "admin" && (

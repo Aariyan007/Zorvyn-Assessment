@@ -12,12 +12,12 @@ export default function Loader() {
           <motion.div
             key={i}
             className="loader-ring"
-            animate={{ rotate: 360 }}
+            animate={{ rotate: i % 2 === 0 ? 360 : -360 }}
             transition={{ repeat: Infinity, duration: 1.8 + i * 0.5, ease: "linear" }}
             style={{
               inset: i * 10,
-              borderTopColor: `rgba(249,115,22,${0.9 - i * 0.25})`,
-              borderRightColor: `rgba(249,115,22,${0.25 - i * 0.06})`,
+              borderTopColor:   `rgba(249,115,22,${0.9 - i * 0.25})`,
+              borderRightColor: `rgba(251,191,36,${0.3 - i * 0.06})`,
             }}
           />
         ))}
@@ -40,7 +40,7 @@ export default function Loader() {
           transition={{ duration: 1.9, ease: [0.4, 0, 0.2, 1] }}
           style={{
             height: "100%",
-            background: "linear-gradient(90deg, var(--orange), var(--orange2))",
+            background: "linear-gradient(90deg, #f97316, #fb923c, #fbbf24)",
             borderRadius: 99,
           }}
         />

@@ -1,23 +1,42 @@
 import { motion } from "framer-motion";
 
 const NAV_ITEMS = [
-  { id: "dashboard",    label: "Dashboard",    icon: "⊞", section: null },
-  { id: "analytics",   label: "Analytics",    icon: "◈", badge: null,   section: null },
-  { id: "transactions",label: "Transactions",  icon: "⇄", badge: null,  section: null },
-  { id: "insights",    label: "Insights",      icon: "⚡", section: null },
+  { id: "dashboard",    label: "Dashboard",    icon: "⊞" },
+  { id: "analytics",   label: "Analytics",    icon: "◈" },
+  { id: "transactions",label: "Transactions",  icon: "⇄" },
+  { id: "insights",    label: "Insights",      icon: "⚡" },
 ];
 
 const FEATURE_ITEMS = [
-  { id: "recurring",    label: "Recurring",    icon: "↻", badge: "3" },
-  { id: "export",       label: "Export",       icon: "↗", badge: null },
-  { id: "settings",     label: "Settings",     icon: "◎", badge: null },
+  { id: "recurring", label: "Recurring", icon: "↻", badge: "3" },
+  { id: "export",    label: "Export",    icon: "↗" },
+  { id: "settings",  label: "Settings",  icon: "◎" },
 ];
 
-export default function Sidebar({ role, setRole, activeNav, setActiveNav }) {
-  function scrollTo(id) {
+// maps nav id → section element id
+const SECTION_MAP = {
+  dashboard:    "section-dashboard",
+  analytics:    "section-analytics",
+  transactions: "section-transactions",
+  insights:     "section-insights",
+  recurring:    "section-recurring",
+};
+
+export default function Sidebar({ role, setRole, activeNav, setActiveNav, onExport, filtered }) {
+  function handleNav(id) {
     setActiveNav(id);
-    const el = document.getElementById("section-" + id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    
+    // Handle special actions
+    if (id === "export" && onExport) {
+      onExport();
+      return;
+    }
+    
+    const targetId = SECTION_MAP[id];
+    if (targetId) {
+      const el = document.getElementById(targetId);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 
   return (
@@ -40,30 +59,36 @@ export default function Sidebar({ role, setRole, activeNav, setActiveNav }) {
       <div className="sidebar-search">
         <span className="sidebar-search-icon">⌕</span>
         <input placeholder="Search…" readOnly />
-        <span style={{ marginLeft: "auto", fontFamily: "var(--mono)", fontSize: 10, color: "var(--text4)", background: "var(--bg4)", padding: "2px 5px", borderRadius: 4 }}>⌘K</span>
+        <span style={{
+          marginLeft: "auto", fontFamily: "var(--mono)",
+          fontSize: 10, color: "var(--text4)",
+          background: "var(--bg4)", padding: "2px 5px", borderRadius: 4,
+        }}>
+          ⌘K
+        </span>
       </div>
 
-      {/* NAV */}
+      {/* MAIN NAV */}
       <nav className="sidebar-nav">
+        <div className="nav-section-label">Main</div>
         {NAV_ITEMS.map((item) => (
           <div
             key={item.id}
             className={`nav-item ${activeNav === item.id ? "active" : ""}`}
-            onClick={() => scrollTo(item.id)}
+            onClick={() => handleNav(item.id)}
           >
             <span className="nav-icon" style={{ fontSize: 15 }}>{item.icon}</span>
             <span>{item.label}</span>
-            {item.badge && <span className="nav-badge">{item.badge}</span>}
           </div>
         ))}
 
         <div className="nav-section-label">Features</div>
-
         {FEATURE_ITEMS.map((item) => (
           <div
             key={item.id}
             className={`nav-item ${activeNav === item.id ? "active" : ""}`}
-            onClick={() => setActiveNav(item.id)}
+            onClick={() => item.id === "export" ? handleNav(item.id) : (item.id === "recurring" ? handleNav(item.id) : setActiveNav(item.id))}
+            style={{ cursor: "pointer" }}
           >
             <span className="nav-icon" style={{ fontSize: 15 }}>{item.icon}</span>
             <span>{item.label}</span>
@@ -72,7 +97,7 @@ export default function Sidebar({ role, setRole, activeNav, setActiveNav }) {
         ))}
       </nav>
 
-      {/* BOTTOM: ROLE SWITCHER */}
+      {/* ROLE SWITCHER */}
       <div className="sidebar-bottom">
         <div className="role-card">
           <div className="role-card-label">Current Role</div>
@@ -92,6 +117,31 @@ export default function Sidebar({ role, setRole, activeNav, setActiveNav }) {
               <option value="admin">Admin</option>
             </select>
           </div>
+
+          {/* role hint */}
+          <div style={{
+            marginTop: 10,
+            fontFamily: "var(--mono)", fontSize: 10,
+            color: "var(--text3)", lineHeight: 1.5,
+          }}>
+            {role === "admin"
+              ? "Admin: can add & delete transactions"
+              : "Viewer: read-only access"}
+          </div>
+        </div>
+
+        {/* localStorage indicator */}
+        <div style={{
+          marginTop: 10,
+          display: "flex", alignItems: "center", gap: 6,
+          fontFamily: "var(--mono)", fontSize: 9,
+          color: "var(--text4)", padding: "0 4px",
+        }}>
+          <span style={{
+            width: 5, height: 5, borderRadius: "50%",
+            background: "var(--green)", display: "inline-block",
+          }} />
+          Data persisted locally
         </div>
       </div>
     </motion.aside>

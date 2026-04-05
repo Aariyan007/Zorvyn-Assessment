@@ -1,55 +1,100 @@
 import { useEffect, useRef } from "react";
 
-// Animated floating orbs drawn on canvas — sits behind everything
+// Floating financial icons + geometric shapes on canvas
+const ICONS = [
+  // SVG path strings as text chars — we draw them as unicode on canvas
+  { char: "₹", size: 28 },
+  { char: "◈", size: 22 },
+  { char: "⬡", size: 26 },
+  { char: "◇", size: 20 },
+  { char: "△", size: 22 },
+  { char: "⊕", size: 24 },
+  { char: "◎", size: 20 },
+  { char: "⬢", size: 26 },
+  { char: "✦", size: 18 },
+  { char: "%",  size: 22 },
+  { char: "↗",  size: 20 },
+  { char: "⬡",  size: 24 },
+];
+
+function makeParticles(W, H, dark) {
+  return Array.from({ length: 45 }, (_, i) => ({
+    x:     Math.random() * W,
+    y:     Math.random() * H,
+    icon:  ICONS[i % ICONS.length],
+    vx:    (Math.random() - 0.5) * 0.22,
+    vy:    (Math.random() - 0.5) * 0.18,
+    alpha: 0.12 + Math.random() * 0.18,
+    rot:   Math.random() * Math.PI * 2,
+    rotV:  (Math.random() - 0.5) * 0.004,
+    scale: 0.8 + Math.random() * 0.9,
+  }));
+}
+
 export default function FloatingBackground({ dark }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    let raf;
-    let W, H;
-
-    const orbs = [
-      { x: 0.15, y: 0.2,  r: 320, speed: 0.00018, angle: 0,    amp: 0.08, color: dark ? "rgba(249,115,22,0.055)" : "rgba(249,115,22,0.09)" },
-      { x: 0.78, y: 0.15, r: 260, speed: 0.00022, angle: 2.1,  amp: 0.06, color: dark ? "rgba(251,146,60,0.04)"  : "rgba(251,146,60,0.07)" },
-      { x: 0.85, y: 0.7,  r: 340, speed: 0.00015, angle: 4.2,  amp: 0.07, color: dark ? "rgba(249,115,22,0.04)"  : "rgba(249,115,22,0.06)" },
-      { x: 0.3,  y: 0.75, r: 200, speed: 0.00025, angle: 1.0,  amp: 0.05, color: dark ? "rgba(234,108,5,0.035)"  : "rgba(234,108,5,0.055)" },
-      { x: 0.55, y: 0.45, r: 180, speed: 0.0002,  angle: 3.5,  amp: 0.04, color: dark ? "rgba(251,146,60,0.03)"  : "rgba(251,146,60,0.05)" },
-    ];
+    const ctx    = canvas.getContext("2d");
+    let raf, W, H;
+    let particles = [];
 
     function resize() {
       W = canvas.width  = window.innerWidth;
       H = canvas.height = window.innerHeight;
+      particles = makeParticles(W, H, dark);
     }
 
-    function draw(t) {
+    // orange colour for icons
+    const iconColor = dark
+      ? "rgba(249,115,22,ALPHA)"
+      : "rgba(234,88,12,ALPHA)";
+
+    function draw() {
       ctx.clearRect(0, 0, W, H);
-      orbs.forEach((o) => {
-        const angle = o.angle + t * o.speed;
-        const cx = (o.x + Math.sin(angle) * o.amp) * W;
-        const cy = (o.y + Math.cos(angle * 1.3) * o.amp) * H;
-        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, o.r);
-        grad.addColorStop(0, o.color);
-        grad.addColorStop(1, "transparent");
-        ctx.beginPath();
-        ctx.arc(cx, cy, o.r, 0, Math.PI * 2);
-        ctx.fillStyle = grad;
-        ctx.fill();
+
+      particles.forEach((p) => {
+        // move
+        p.x   += p.vx;
+        p.y   += p.vy;
+        p.rot += p.rotV;
+        // wrap
+        if (p.x < -60)  p.x = W + 60;
+        if (p.x > W + 60) p.x = -60;
+        if (p.y < -60)  p.y = H + 60;
+        if (p.y > H + 60) p.y = -60;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.font = `${p.icon.size * p.scale}px "DM Mono", monospace`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = iconColor.replace("ALPHA", p.alpha.toFixed(2));
+        ctx.fillText(p.icon.char, 0, 0);
+        ctx.restore();
       });
+
       raf = requestAnimationFrame(draw);
     }
 
     resize();
     window.addEventListener("resize", resize);
     raf = requestAnimationFrame(draw);
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", resize); };
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", resize);
+    };
   }, [dark]);
 
   return (
     <canvas
       ref={canvasRef}
-      style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }}
+      style={{
+        position: "fixed", inset: 0,
+        pointerEvents: "none", zIndex: 0,
+      }}
     />
   );
 }
