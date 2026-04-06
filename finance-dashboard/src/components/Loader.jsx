@@ -30,7 +30,7 @@ export default function Loader() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        FinFlow
+        Fin-Arc
       </motion.div>
 
       <div className="loader-bar-wrap">

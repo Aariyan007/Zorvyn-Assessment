@@ -31,10 +31,9 @@ export default function Insights({ transactions }) {
     <div id="section-insights" style={{ scrollMarginTop: 80 }}>
       <div className="section-header">
         <span className="section-title">Key Insights</span>
+        <br></br>
       </div>
       <div className="insights-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
-        
-        {/* Top Spending Category */}
         <motion.div
           className="insight-card"
           initial={{ opacity: 0, y: 10 }}
@@ -86,7 +85,7 @@ export default function Insights({ transactions }) {
           <div style={{ fontSize: 24, fontWeight: 700, color: "var(--green)" }}>
             {recurringTxs}
           </div>
-          <div style={{ fontSize: 12, color: "var(--text3)" }}>categories</div>
+          <div style={{ fontSize: 12, color: "var(--text3)" }}>Categories</div>
         </motion.div>
 
       </div>

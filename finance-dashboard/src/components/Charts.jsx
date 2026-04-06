@@ -17,9 +17,11 @@ const tooltip = {
 function scale(axis) {
   return {
     ticks: {
-      color: "var(--text3)",
-      font: { size: 11, family: "DM Mono" },
-      ...(axis === "y" ? { callback: (v) => "₹" + v } : {}),
+      color: "#fffafa",
+      font: { size: 14, family: "DM Mono" },
+      ...(axis === "y" ? { callback: (v) => "₹" + v ,stepSize:1000} : {}),
+      maxRotation: 45,
+      minRotation: 0,
     },
     grid: { color: "rgba(128,128,128,0.06)" },
     border: { display: false },
@@ -54,6 +56,7 @@ export function BalanceTrendChart({ transactions }) {
           pointBackgroundColor: "#f97316",
           pointRadius: 5, pointHoverRadius: 7,
           borderWidth: 2.5,
+          // textColor: "#f97316",
         }],
       },
       options: {
@@ -71,7 +74,7 @@ export function BalanceTrendChart({ transactions }) {
         <span className="chart-title">Balance Trend</span>
         <span className="section-badge">Apr 2026</span>
       </div>
-      <div style={{ position: "relative", height: 210 }}><canvas ref={ref} /></div>
+      <div style={{ position: "relative", height: 320 }}><canvas ref={ref} /></div>
     </div>
   );
 }
@@ -111,17 +114,19 @@ export function SpendingDonutChart({ transactions }) {
         <span className="section-badge">by category</span>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-        <div style={{ flexShrink: 0, width: 140, height: 140, position: "relative" }}>
-          <canvas ref={ref} width={140} height={140} />
+        <div style={{ flexShrink: 0, width: 240, height: 240, position: "relative" ,marginTop:"30px"}}>
+          <canvas ref={ref} width={240} height={240} />
           {total > 0 && (
             <div style={{
               position: "absolute", inset: 0,
               display: "flex", flexDirection: "column",
               alignItems: "center", justifyContent: "center",
               pointerEvents: "none",
+              padding: 0,
+               marginRight:"0px", marginBottom:"20px",
             }}>
-              <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)" }}>total</div>
-              <div style={{ fontFamily: "var(--head)", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
+              <div style={{ fontFamily: "var(--mono)", fontSize: 15, color: "var(--text3)", lineHeight: 1}}>Total</div>
+              <div style={{ fontFamily: "var(--head)", fontSize: 20, fontWeight: 700, color: "var(--text)", lineHeight: 1}} >
                 ₹{total.toLocaleString("en-IN")}
               </div>
             </div>
@@ -132,7 +137,7 @@ export function SpendingDonutChart({ transactions }) {
             <div key={k} style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ width: 7, height: 7, borderRadius: 2, background: getCategoryColor(k), flexShrink: 0, display: "inline-block" }} />
               <span style={{ fontSize: 12, color: "var(--text2)", flex: 1, fontWeight: 500 }}>{k}</span>
-              <span style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--text3)" }}>
+              <span style={{ fontFamily: "var(--mono)", fontSize: 20, color: "var(--text3)" }}>
                 {total ? Math.round((v / total) * 100) : 0}%
               </span>
             </div>
@@ -155,13 +160,24 @@ export function MonthlyBarChart({ transactions }) {
     const expense = months.map((m) => transactions.filter((t) => t.type === "expense" && t.date.startsWith(m)).reduce((a, t) => a + t.amount, 0));
 
     if (chart.current) chart.current.destroy();
+    
+    // Create canvas gradients
+    const ctx = ref.current.getContext('2d');
+    const incomeGradient = ctx.createLinearGradient(0, 0, 0, 280);
+    incomeGradient.addColorStop(0, 'rgba(34,197,94,0.8)');
+    incomeGradient.addColorStop(1, 'rgba(34,197,94,0.1)');
+    
+    const expenseGradient = ctx.createLinearGradient(0, 0, 0, 700);
+    expenseGradient.addColorStop(0, 'rgba(255, 106, 0, 0.8)');
+    expenseGradient.addColorStop(1, '#ffffff1a');
+    
     chart.current = new Chart(ref.current, {
       type: "bar",
       data: {
         labels,
         datasets: [
-          { label: "Income",  data: income,  backgroundColor: "rgba(34,197,94,0.7)",  borderRadius: 8, borderSkipped: false },
-          { label: "Expense", data: expense, backgroundColor: "rgba(239,68,68,0.6)", borderRadius: 8, borderSkipped: false },
+          { label: "Income",  data: income,  backgroundColor: incomeGradient,  borderRadius: 8, borderSkipped: false },
+          { label: "Expense", data: expense, backgroundColor: expenseGradient, borderRadius: 8, borderSkipped: false },
         ],
       },
       options: {
@@ -188,7 +204,7 @@ export function MonthlyBarChart({ transactions }) {
           ))}
         </div>
       </div>
-      <div style={{ position: "relative", height: 160 }}><canvas ref={ref} /></div>
+      <div style={{ position: "relative", height: 280 }}><canvas ref={ref} /></div>
     </div>
   );
 }

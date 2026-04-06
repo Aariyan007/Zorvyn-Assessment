@@ -31,21 +31,19 @@ function lsSet(key, val) {
 export default function App() {
   const [loading, setLoading] = useState(true);
 
-  // persisted state — initialised from localStorage
   const [dark,         setDarkRaw]  = useState(() => lsGet(LS_DARK, true));
   const [role,         setRoleRaw]  = useState(() => lsGet(LS_ROLE, "viewer"));
   const [transactions, setTxRaw]    = useState(() => lsGet(LS_TX,   transactionsData));
 
-  // ui-only state (not persisted)
   const [search,      setSearch]      = useState("");
   const [filterType,  setFilterType]  = useState("all");
   const [sortOrder,   setSortOrder]   = useState("none");
   const [toast,       setToast]       = useState(null);
   const [activeNav,   setActiveNav]   = useState("dashboard");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  /* persist on change */
-  function setDark(v)         { setDarkRaw(v);  lsSet(LS_DARK, v); }
-  function setRole(v)         { setRoleRaw(v);  lsSet(LS_ROLE, v); }
+  function setDark(v)          { setDarkRaw(v);  lsSet(LS_DARK, v); }
+  function setRole(v)          { setRoleRaw(v);  lsSet(LS_ROLE, v); }
   function setTransactions(fn) {
     setTxRaw((prev) => {
       const next = typeof fn === "function" ? fn(prev) : fn;
@@ -54,15 +52,27 @@ export default function App() {
     });
   }
 
-  /* apply dark class */
+  function handleNavClick(id) {
+    setActiveNav(id);
+    setSidebarOpen(false);
+  }
+
   useEffect(() => {
     document.documentElement.className = dark ? "" : "light";
   }, [dark]);
 
-  /* loader */
   useEffect(() => { const t = setTimeout(() => setLoading(false), 2200); return () => clearTimeout(t); }, []);
 
-  /* ── filtered list ── */
+  // Prevent body scroll when sidebar is open on mobile
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [sidebarOpen]);
+
   let filtered = transactions.filter((t) => {
     const q = search.toLowerCase();
     return (
@@ -75,12 +85,10 @@ export default function App() {
   else if (sortOrder === "date_new") filtered.sort((a, b) => b.date.localeCompare(a.date));
   else if (sortOrder === "date_old") filtered.sort((a, b) => a.date.localeCompare(b.date));
 
-  /* ── summary totals ── */
   const income  = transactions.filter((t) => t.type === "income") .reduce((a, t) => a + (Number(t.amount) || 0), 0);
   const expense = transactions.filter((t) => t.type === "expense").reduce((a, t) => a + (Number(t.amount) || 0), 0);
   const balance = income - expense;
 
-  /* ── actions ── */
   function deleteTx(id)  { setTransactions((p) => p.filter((t) => t.id !== id)); showToast("Transaction removed"); }
   function addTx(tx)     { setTransactions((p) => [tx, ...p]);                   showToast("Transaction added!"); }
   function resetData()   { setTransactions(transactionsData);                    showToast("Data reset to defaults"); }
@@ -126,9 +134,11 @@ export default function App() {
             dark={dark}
             setDark={setDark}
             activeNav={activeNav}
-            setActiveNav={setActiveNav}
+            setActiveNav={handleNavClick}
             onExport={exportCSV}
             filtered={filtered}
+            isOpen={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
           />
 
           {/* ── MAIN ── */}
@@ -137,8 +147,16 @@ export default function App() {
             {/* TOPBAR */}
             <div className="topbar">
               <div className="topbar-left">
+                {/* Hamburger — shown via CSS on mobile */}
+                <button
+                  className="mobile-menu-btn"
+                  onClick={() => setSidebarOpen(true)}
+                  aria-label="Open menu"
+                >
+                  ☰
+                </button>
                 <div className="breadcrumb">
-                  <span>FinFlow</span>
+                  <span>Fin-Arc</span>
                   <span className="breadcrumb-sep">›</span>
                   <span className="breadcrumb-current">Dashboard</span>
                 </div>
@@ -154,43 +172,37 @@ export default function App() {
             {/* PAGE CONTENT */}
             <div className="page-content">
 
-              {/* header */}
               <motion.div {...fadeUp(0)} className="page-header">
                 <div className="page-title">Dashboard Overview</div>
                 <div className="page-subtitle">Here is a summary of your overall financial activity</div>
               </motion.div>
 
-              {/* ── SUMMARY CARDS ── renders ONCE with computed values ── */}
               <motion.div {...fadeUp(0.05)}>
                 <SummaryCards balance={balance} income={income} expense={expense} />
               </motion.div>
 
-              {/* ── INSIGHTS ── */}
               <motion.div {...fadeUp(0.1)}>
                 <Insights transactions={transactions} />
               </motion.div>
 
-              {/* ── CHARTS ── */}
               <motion.div {...fadeUp(0.15)}>
                 <div id="section-analytics" style={{ scrollMarginTop: 80 }}>
-              <div className="section-header">
-                  <span className="section-title">Analytics</span>
-                  <span className="section-badge">Apr 2026</span>
-                </div>
-                <div className="charts-grid" style={{ marginBottom: 14 }}>
-                  <BalanceTrendChart  transactions={transactions} />
-                  <SpendingDonutChart transactions={transactions} />
-                </div>
-                <MonthlyBarChart transactions={transactions} />
+                  <div className="section-header">
+                    <span className="section-title">Analytics</span>
+                    <span className="section-badge">Apr 2026</span>
+                  </div>
+                  <div className="charts-grid" style={{ marginBottom: 14 }}>
+                    <BalanceTrendChart  transactions={transactions} />
+                    <SpendingDonutChart transactions={transactions} />
+                  </div>
+                  <MonthlyBarChart transactions={transactions} />
                 </div>
               </motion.div>
 
-              {/* ── CATEGORY BARS ── */}
               <motion.div {...fadeUp(0.2)}>
                 <CategoryBars transactions={transactions} />
               </motion.div>
 
-              {/* ── RECURRING TRANSACTIONS ── */}
               <motion.div {...fadeUp(0.21)}>
                 <div id="section-recurring" style={{ scrollMarginTop: 80 }}>
                   <div className="section-header">
@@ -199,7 +211,6 @@ export default function App() {
                   <div className="tx-card">
                     <div style={{ overflowX: "auto" }}>
                       {(() => {
-                        // Find recurring transactions (same category appears 3+ times)
                         const categoryCount = {};
                         transactions.forEach(t => {
                           categoryCount[t.category] = (categoryCount[t.category] || 0) + 1;
@@ -218,7 +229,6 @@ export default function App() {
                 </div>
               </motion.div>
 
-              {/* ── TRANSACTIONS ── */}
               <motion.div {...fadeUp(0.22)}>
                 <div className="tx-card" id="section-transactions">
                   <div className="tx-toolbar">
@@ -227,7 +237,6 @@ export default function App() {
                       <span className="tx-count">{filtered.length}</span>
                     </div>
                     <div className="tx-actions">
-                      {/* admin only: add + reset */}
                       <AddTransaction addTx={addTx} role={role} />
                       {role === "admin" && (
                         <button className="btn btn-ghost" onClick={resetData} title="Reset to default data">
@@ -251,7 +260,6 @@ export default function App() {
                 </div>
               </motion.div>
 
-              {/* FOOTER */}
               <div style={{
                 textAlign: "center", fontFamily: "var(--mono)",
                 fontSize: 11, color: "var(--text3)",

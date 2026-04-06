@@ -22,7 +22,7 @@ export default function AddTransaction({ addTx, role }) {
   }
 
   return (
-    <div>
+    <div style={{ position: "relative" }}>
       <motion.button
         className={`btn ${open ? "btn-ghost" : "btn-primary"}`}
         whileHover={{ scale: 1.02 }}
@@ -42,23 +42,39 @@ export default function AddTransaction({ addTx, role }) {
         {open && (
           <motion.div
             key="form"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-            style={{ overflow: "hidden", position: "absolute", right: 0, minWidth: 400, zIndex: 20 }}
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+            style={{
+              position: "absolute",
+              top: "calc(100% + 10px)",
+              right: 0,
+              width: "min(420px, 90vw)",
+              zIndex: 30,
+            }}
           >
-            <div className="add-form" style={{ marginTop: 8 }}>
+            <div className="add-form">
               <div className="add-form-grid">
                 <div className="form-field">
                   <label className="form-label">Amount (₹)</label>
-                  <input className="form-input" type="number" min="1" placeholder="500"
-                    value={amount} onChange={(e) => setAmount(e.target.value)} />
+                  <input
+                    className="form-input"
+                    type="number"
+                    min="1"
+                    placeholder="500"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                  />
                 </div>
                 <div className="form-field">
                   <label className="form-label">Category</label>
-                  <input className="form-input" placeholder="Food, Rent…"
-                    value={category} onChange={(e) => setCategory(e.target.value)} />
+                  <input
+                    className="form-input"
+                    placeholder="Food, Rent…"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                  />
                 </div>
                 <div className="form-field">
                   <label className="form-label">Type</label>
@@ -69,8 +85,12 @@ export default function AddTransaction({ addTx, role }) {
                 </div>
                 <div className="form-field">
                   <label className="form-label">Date</label>
-                  <input className="form-input" type="date" value={date}
-                    onChange={(e) => setDate(e.target.value)} />
+                  <input
+                    className="form-input"
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                  />
                 </div>
               </div>
 
@@ -78,6 +98,7 @@ export default function AddTransaction({ addTx, role }) {
 
               <motion.button
                 className="btn btn-primary"
+                style={{ width: "100%" }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={handleSubmit}

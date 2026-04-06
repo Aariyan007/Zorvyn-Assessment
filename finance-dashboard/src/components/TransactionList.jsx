@@ -55,8 +55,8 @@ export default function TransactionList({ transactions, role, deleteTx }) {
                 <span className={`type-badge ${t.type === "income" ? "type-income" : "type-expense"}`}
                   style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
                   {t.type === "income"
-                    ? <><IconArrowUp size={10} color="var(--green)" /> income</>
-                    : <><IconArrowDown size={10} color="var(--red)" /> expense</>}
+                    ? <><IconArrowUp size={10} color="var(--green)" /> Income</>
+                    : <><IconArrowDown size={10} color="var(--red)" /> Expense</>}
                 </span>
               </td>
 
@@ -86,7 +86,7 @@ export default function TransactionList({ transactions, role, deleteTx }) {
                     whileTap={{ scale: 0.95 }}
                     onClick={() => deleteTx(t.id)}
                   >
-                    delete
+                    Delete
                   </motion.button>
                 </td>
               )}

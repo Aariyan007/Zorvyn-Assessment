@@ -17,10 +17,10 @@ export default function Filters({ search, setSearch, filterType, setFilterType, 
       </select>
       <select className="filter-select" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
         <option value="none">Sort: default</option>
-        <option value="high">Amount: high → low</option>
-        <option value="low">Amount: low → high</option>
-        <option value="date_new">Date: newest first</option>
-        <option value="date_old">Date: oldest first</option>
+        <option value="high">Amount: High → Low</option>
+        <option value="low">Amount: Low → High</option>
+        <option value="date_new">Date: Newest first</option>
+        <option value="date_old">Date: Oldest first</option>
       </select>
     </div>
   );

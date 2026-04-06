@@ -29,7 +29,7 @@ export default function SummaryCards({ balance, income, expense }) {
         </div>
         <div className="hero-label">Total Balance</div>
         <div className="hero-value">{fmt(b)}</div>
-        <div className="hero-sub">income − expenses</div>
+        <div className="hero-sub">Income − Expenses</div>
         <div style={{
           marginTop: 18, display: "inline-flex", alignItems: "center", gap: 6,
           background: "rgba(0,0,0,0.15)", borderRadius: 99,
@@ -57,7 +57,7 @@ export default function SummaryCards({ balance, income, expense }) {
         </div>
         <div className="summary-label">Total Income</div>
         <div className="summary-value" style={{ color: "var(--green)" }}>{fmt(i)}</div>
-        <div className="summary-sub">money coming in</div>
+        <div className="summary-sub">Money coming in</div>
       </motion.div>
 
       {/* ── Expenses ── */}
@@ -74,7 +74,7 @@ export default function SummaryCards({ balance, income, expense }) {
         </div>
         <div className="summary-label">Total Expenses</div>
         <div className="summary-value" style={{ color: "var(--red)" }}>{fmt(e)}</div>
-        <div className="summary-sub">money going out</div>
+        <div className="summary-sub">Money going out</div>
       </motion.div>
 
     </div>
