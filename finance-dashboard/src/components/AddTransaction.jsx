@@ -49,8 +49,11 @@ export default function AddTransaction({ addTx, role }) {
             style={{
               position: "absolute",
               top: "calc(100% + 10px)",
-              right: 0,
-              width: "min(420px, 90vw)",
+              right: window.innerWidth <= 600 ? "50%" : 0,
+              transform: window.innerWidth <= 600 ? "translateX(50%)" : "none",
+              width: window.innerWidth <= 600 ? "calc(100vw - 24px)" : "min(420px, 90vw)",
+              maxHeight: "80vh",
+              overflowY: "auto",
               zIndex: 30,
             }}
           >

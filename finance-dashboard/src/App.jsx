@@ -8,11 +8,10 @@ import AddTransaction     from "./components/AddTransaction";
 import Insights           from "./components/Insights";
 import CategoryBars       from "./components/CategoryBars";
 import Loader             from "./components/Loader";
-import Sidebar            from "./components/Sidebar";
+import Sidebar            from "./components/sidebar";
 import FloatingBackground from "./components/Floatingbackground ";
 import { BalanceTrendChart, SpendingDonutChart, MonthlyBarChart } from "./components/Charts";
 
-/* ── localStorage helpers ─────────────────────── */
 const LS_TX   = "finflow_transactions";
 const LS_ROLE = "finflow_role";
 const LS_DARK = "finflow_dark";
@@ -27,7 +26,6 @@ function lsSet(key, val) {
   try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
 }
 
-/* ── App ─────────────────────────────────────── */
 export default function App() {
   const [loading, setLoading] = useState(true);
 
@@ -63,7 +61,6 @@ export default function App() {
 
   useEffect(() => { const t = setTimeout(() => setLoading(false), 2200); return () => clearTimeout(t); }, []);
 
-  // Prevent body scroll when sidebar is open on mobile
   useEffect(() => {
     if (sidebarOpen) {
       document.body.style.overflow = "hidden";
@@ -266,7 +263,7 @@ export default function App() {
                 paddingTop: 20, borderTop: "1px solid var(--border)",
                 marginBottom: 8,
               }}>
-                finflow · data persisted in localStorage · {new Date().getFullYear()}
+                Fin-Arc · data persisted in localStorage · {new Date().getFullYear()}
               </div>
 
             </div>

@@ -512,11 +512,20 @@ body {
 .insight-sub { font-size: 11.5px; color: var(--text3); margin-top: 2px; }
 
 /* ── CHARTS ──────────────────────────────────────── */
+/* ── CHARTS GRID ─────────────────────────────────── */
 .charts-grid {
   display: grid;
   grid-template-columns: 1.3fr 1fr;
   gap: 14px;
   margin-bottom: 24px;
+}
+
+@media (max-width: 900px) {
+  .charts-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .charts-grid { grid-template-columns: 1fr; }
 }
 .chart-card {
   background: var(--bg2);
@@ -525,14 +534,28 @@ body {
   border-radius: var(--radius);
   padding: 20px 22px;
   box-shadow: var(--shadow);
+  overflow: auto;
 }
 .chart-title-row {
   display: flex; align-items: center;
   justify-content: space-between; margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 .chart-title {
   font-family: var(--head); font-size: 17px;
   font-weight: 600; color: var(--text);
+}
+
+@media (max-width: 768px) {
+  .chart-card { padding: 16px 16px; }
+  .chart-title { font-size: 15px; }
+  .chart-title-row { margin-bottom: 14px; }
+}
+
+@media (max-width: 600px) {
+  .chart-card { padding: 14px 12px; }
+  .chart-title { font-size: 14px; }
 }
 
 /* ── CATEGORY BARS ───────────────────────────────── */
@@ -653,6 +676,7 @@ body {
 .add-form {
   background: var(--bg3); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 18px 20px; margin-top: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
 }
 .add-form-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -672,6 +696,18 @@ body {
 .form-input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-dim); }
 .form-input::placeholder { color: var(--text3); }
 .form-error { font-size: 12px; color: var(--red); margin-bottom: 10px; }
+
+@media (max-width: 768px) {
+  .add-form { padding: 16px 16px; }
+  .add-form-grid { gap: 10px; margin-bottom: 12px; }
+}
+
+@media (max-width: 600px) {
+  .add-form { padding: 14px 14px; }
+  .add-form-grid { grid-template-columns: 1fr; gap: 10px; }
+  .form-label { font-size: 10px; }
+  .form-input { padding: 8px 10px; font-size: 14px; }
+}
 
 /* ── TOAST ───────────────────────────────────────── */
 .toast {
@@ -717,6 +753,13 @@ body {
 .loader-pulse { font-family: var(--mono); font-size: 11px; color: var(--text3); }
 
 /* ── RESPONSIVE ──────────────────────────────────── */
+/* ── DESKTOP (>768px) — sidebar always visible ────── */
+@media (min-width: 769px) {
+  .sidebar {
+    transform: translateX(0) !important;
+  }
+}
+
 @media (max-width: 1100px) {
   .charts-grid { grid-template-columns: 1fr; }
   .insights-grid { grid-template-columns: repeat(2, 1fr); }

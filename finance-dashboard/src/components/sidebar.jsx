@@ -21,10 +21,9 @@ const SECTION_MAP = {
   recurring:    "section-recurring",
 };
 
-export default function Sidebar({ role, setRole, activeNav, setActiveNav, onExport, filtered, isOpen, onClose }) {
+export default function Sidebar({ role, setRole, activeNav, setActiveNav, onExport, isOpen, onClose }) {
   function handleNav(id) {
     setActiveNav(id);
-    // Close sidebar on mobile after nav
     onClose();
 
     if (id === "export" && onExport) {
@@ -34,28 +33,32 @@ export default function Sidebar({ role, setRole, activeNav, setActiveNav, onExpo
 
     const targetId = SECTION_MAP[id];
     if (targetId) {
-      const el = document.getElementById(targetId);
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      setTimeout(() => {
+        const el = document.getElementById(targetId);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 320);
     }
   }
 
   return (
     <>
-      {/* Backdrop overlay — only visible on mobile when sidebar is open */}
+      {/* Dark backdrop — click to close */}
       <div
         className={`sidebar-overlay ${isOpen ? "active" : ""}`}
         onClick={onClose}
         aria-hidden="true"
       />
 
-      <motion.aside
-        className={`sidebar ${isOpen ? "active" : ""}`}
-        initial={{ x: -260 }}
-        animate={{ x: isOpen ? 0 : -260 }}
-        transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-      >
-        {/* CLOSE BUTTON — visible on mobile */}
+      {/*
+        Use a plain <aside> — NOT motion.aside with animate={{ x }} —
+        so that CSS transform: translateX(-100%) / translateX(0) via
+        .sidebar and .sidebar.active works without being overridden.
+      */}
+      <aside className={`sidebar ${isOpen ? "active" : ""}`}>
+
+        {/* ✕ CLOSE — only visible on mobile via CSS */}
         <button
+          type="button"
           onClick={onClose}
           className="sidebar-close-btn"
           aria-label="Close menu"
@@ -105,7 +108,6 @@ export default function Sidebar({ role, setRole, activeNav, setActiveNav, onExpo
               key={item.id}
               className={`nav-item ${activeNav === item.id ? "active" : ""}`}
               onClick={() => handleNav(item.id)}
-              style={{ cursor: "pointer" }}
             >
               <span className="nav-icon" style={{ fontSize: 15 }}>{item.icon}</span>
               <span>{item.label}</span>
@@ -134,7 +136,6 @@ export default function Sidebar({ role, setRole, activeNav, setActiveNav, onExpo
                 <option value="admin">Admin</option>
               </select>
             </div>
-
             <div style={{
               marginTop: 10,
               fontFamily: "var(--mono)", fontSize: 10,
@@ -159,7 +160,7 @@ export default function Sidebar({ role, setRole, activeNav, setActiveNav, onExpo
             Data persisted locally
           </div>
         </div>
-      </motion.aside>
+      </aside>
     </>
   );
 }

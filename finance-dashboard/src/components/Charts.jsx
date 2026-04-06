@@ -74,7 +74,7 @@ export function BalanceTrendChart({ transactions }) {
         <span className="chart-title">Balance Trend</span>
         <span className="section-badge">Apr 2026</span>
       </div>
-      <div style={{ position: "relative", height: 320 }}><canvas ref={ref} /></div>
+      <div style={{ position: "relative", height: window.innerWidth <= 600 ? 200 : window.innerWidth <= 768 ? 250 : 320 }}><canvas ref={ref} /></div>
     </div>
   );
 }
@@ -100,7 +100,7 @@ export function SpendingDonutChart({ transactions }) {
         datasets: [{ data: entries.map(([, v]) => v), backgroundColor: entries.map(([k]) => getCategoryColor(k)), borderWidth: 0, hoverOffset: 6 }],
       },
       options: {
-        responsive: false, cutout: "72%",
+        responsive: true, maintainAspectRatio: true, cutout: "72%",
         plugins: { legend: { display: false }, tooltip: { ...tooltip, callbacks: { label: (c) => " ₹" + c.parsed.toLocaleString("en-IN") } } },
       },
     });
@@ -113,9 +113,9 @@ export function SpendingDonutChart({ transactions }) {
         <span className="chart-title">Spending Breakdown</span>
         <span className="section-badge">by category</span>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-        <div style={{ flexShrink: 0, width: 240, height: 240, position: "relative" ,marginTop:"30px"}}>
-          <canvas ref={ref} width={240} height={240} />
+      <div style={{ display: "flex", flexDirection: window.innerWidth <= 768 ? "column" : "row", alignItems: "center", gap: 18 }}>
+        <div style={{ flexShrink: 0, width: window.innerWidth <= 600 ? "100%" : window.innerWidth <= 768 ? "200px" : "240px", height: window.innerWidth <= 600 ? "200px" : window.innerWidth <= 768 ? "200px" : "240px", position: "relative", marginTop: "30px", maxWidth: "240px" }}>
+          <canvas ref={ref} width={window.innerWidth <= 600 ? 200 : window.innerWidth <= 768 ? 200 : 240} height={window.innerWidth <= 600 ? 200 : window.innerWidth <= 768 ? 200 : 240} />
           {total > 0 && (
             <div style={{
               position: "absolute", inset: 0,
@@ -132,12 +132,12 @@ export function SpendingDonutChart({ transactions }) {
             </div>
           )}
         </div>
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8, width: window.innerWidth <= 768 ? "100%" : "auto" }}>
           {entries.map(([k, v]) => (
             <div key={k} style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ width: 7, height: 7, borderRadius: 2, background: getCategoryColor(k), flexShrink: 0, display: "inline-block" }} />
-              <span style={{ fontSize: 12, color: "var(--text2)", flex: 1, fontWeight: 500 }}>{k}</span>
-              <span style={{ fontFamily: "var(--mono)", fontSize: 20, color: "var(--text3)" }}>
+              <span style={{ fontSize: window.innerWidth <= 600 ? 11 : 12, color: "var(--text2)", flex: 1, fontWeight: 500 }}>{k}</span>
+              <span style={{ fontFamily: "var(--mono)", fontSize: window.innerWidth <= 600 ? 16 : 20, color: "var(--text3)" }}>
                 {total ? Math.round((v / total) * 100) : 0}%
               </span>
             </div>
@@ -204,7 +204,7 @@ export function MonthlyBarChart({ transactions }) {
           ))}
         </div>
       </div>
-      <div style={{ position: "relative", height: 280 }}><canvas ref={ref} /></div>
+      <div style={{ position: "relative", height: window.innerWidth <= 600 ? 200 : window.innerWidth <= 768 ? 240 : 280 }}><canvas ref={ref} /></div>
     </div>
   );
 }
